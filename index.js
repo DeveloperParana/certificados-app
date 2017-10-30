@@ -1,9 +1,7 @@
 const admin = require('firebase-admin');
 const axios = require('axios');
 const bodyParser = require('koa-bodyparser');
-const crypto = require('crypto')
 const Koa = require('koa');
-const querystring = require('querystring');
 const Router = require('koa-router');
 const session = require('koa-session');
 const views = require('koa-views');
@@ -11,6 +9,7 @@ const yenv = require('yenv');
 
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
+const md5 = require('./src/helpers/md5');
 const serviceAccount = require('./credential.json');
 
 const app = new Koa();
@@ -37,7 +36,7 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 //Inicializando firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://devparana-certificates.firebaseio.com'
+  databaseURL: env.FIREBASE_DATABASE_URL
 });
 
 router.get('/', ctx => {
@@ -87,39 +86,41 @@ router.get('/event/:id', async ctx => {
 })
 
 router.post('/event/access', async ctx => {
-  let md5 = crypto.createHash('md5').update(ctx.request.body.email).digest('hex');
-  const url = ctx.session.event_url + md5 + '.pdf';
+  const url = ctx.session.event_url + md5(ctx.request.body.email) + '.pdf';
 
   return ctx.redirect(url)
 })
 
 router.get('/authorize', async ctx => {
-  let params = {
-    client_id: env.MEETUP_KEY,
-    response_type: 'code',
-    redirect_uri: env.AUTH_REDIRECT_URI
-  };
+  const meetupService = require('./src/services/meetup');
 
-  ctx.redirect(MEETUP_OAUTH_URL + 'authorize?' + querystring.stringify(params));
+  return ctx.redirect(
+    meetupService.getRedirectURL(
+      config.MEETUP_OAUTH_URL,
+      env.MEETUP_KEY,
+      env.AUTH_REDIRECT_URI
+    )
+  );
 })
 
 router.get('/process', async ctx => {
   try {
-    let params = {
-      client_id: env.MEETUP_KEY,
-      client_secret: env.MEETUP_SECRET,
-      grant_type: 'authorization_code',
-      redirect_uri: env.AUTH_REDIRECT_URI,
-      code: ctx.query.code
-    }
+    const meetupService = require('./src/services/meetup');
 
-    const result = await axios.post(MEETUP_OAUTH_URL + 'access', querystring.stringify(params));
+    const accessToken = await meetupService.getAccessToken(
+      env.MEETUP_KEY,
+      env.MEETUP_SECRET,
+      env.AUTH_REDIRECT_URI,
+      ctx.query.code,
+      config.MEETUP_OAUTH_URL
+    );
 
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + result.data.access_token;
-    const member = await axios.get(MEETUP_API_URL + 'members/self');
+    const member = await meetupService.getMember(
+      config.MEETUP_API_URL,
+      accessToken
+    );
 
-    let md5 = crypto.createHash('md5').update(member.data.id.toString()).digest('hex');
-    const eventUrl = ctx.session.event_url + md5 + '.pdf';
+    const eventUrl = ctx.session.event_url + md5(member.data.id.toString()) + '.pdf';
 
     ctx.state = {
       name: member.data.name,
