@@ -1,3 +1,4 @@
+const admin = require('firebase-admin');
 const axios = require('axios');
 const bodyParser = require('koa-bodyparser');
 const crypto = require('crypto')
@@ -10,15 +11,20 @@ const yenv = require('yenv');
 
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
+const serviceAccount = require('./credential.json');
 
 const app = new Koa();
 const router = new Router();
 const env = yenv();
 
+//Adicionando suporte a sessão
 app.keys = [env.APP_KEY];
 app.use(session(config.SESSION, app));
+
+//Adicionando suporte ao body-parser
 app.use(bodyParser());
 
+//Adicionando suporte a views com o handlebars
 app.use(views(__dirname + config.DIR_VIEWS, {
   map: { hbs: 'handlebars' },
   options: {
@@ -27,6 +33,12 @@ app.use(views(__dirname + config.DIR_VIEWS, {
     }
   }
 }))
+
+//Inicializando firebase
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://devparana-certificate.firebaseio.com'
+});
 
 router.get('/', ctx => {
   ctx.state = {
