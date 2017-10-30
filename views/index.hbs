@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>DevParana Certificados</title>
+</head>
+<body>
+  <h1>Eventos</h1>
+  <h2>Acesso por email</h2>
+  {{#list email}}<a href="{{link}}">{{name}}</a>{{/list}}
+
+  <h2>Acesso pelo Meetup.com</h2>
+  {{#list meetup}}<a href="{{link}}">{{name}}</a>{{/list}}
+</body>
+</html>
