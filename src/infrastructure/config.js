@@ -9,5 +9,5 @@ module.exports = {
   },
   MEETUP_OAUTH_URL: 'https://secure.meetup.com/oauth2/',
   MEETUP_API_URL: 'https://api.meetup.com/',
-  DIR_VIEWS: 'src/views/'
+  DIR_VIEWS: '/src/views/'
 }

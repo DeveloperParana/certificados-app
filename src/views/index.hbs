@@ -7,10 +7,6 @@
 </head>
 <body>
   <h1>Eventos</h1>
-  <h2>Acesso por email</h2>
-  {{#list email}}<a href="{{link}}">{{name}}</a>{{/list}}
-
-  <h2>Acesso pelo Meetup.com</h2>
-  {{#list meetup}}<a href="{{link}}">{{name}}</a>{{/list}}
+  {{#list events}}<a href="{{url}}">{{name}}</a>{{/list}}
 </body>
 </html>

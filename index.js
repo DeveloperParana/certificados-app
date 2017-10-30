@@ -37,33 +37,50 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 //Inicializando firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://devparana-certificate.firebaseio.com'
+  databaseURL: 'https://devparana-certificates.firebaseio.com'
 });
 
 router.get('/', ctx => {
-  ctx.state = {
-    meetup: [
-      { name: 'Meetup DevParana / Conectadas UEM', link: env.BASE_URL + 'event/2' }
-    ],
-    email: [
-      { name: 'DevParaná Conference 2017', link: env.BASE_URL + 'event/1' }
-    ]
-  }
+  const eventService = require('./src/services/event');
 
-  return ctx.render('./index.hbs')
+  return new Promise((resolve, reject) => {
+    eventService
+        .getAll(admin)
+        .then(result => {
+            let data = result.val();
+            ctx.session.events = data;
+
+            ctx.state = {
+                events: data.map(e => {
+                  return {
+                    name: e.name,
+                    url: env.BASE_URL + 'event/' + e.id.toString()
+                  }
+                })
+            };
+            resolve(ctx.render('./index.hbs'));
+        })
+        .catch(error => {
+            console.log(error);
+            reject(error)
+        });
+  });
 })
 
 router.get('/event/:id', async ctx => {
-  let event = ctx.params.id;
+  const filterEvents = require('./src/helpers/load-events');
+  const event = filterEvents.load(ctx.session.events, ctx.params.id);
 
-  if (event == 1) {
-    ctx.session.event_url = 'https://github.com/DeveloperParana/certificados/blob/master/2017/conference/';
-    return ctx.render('./email.hbs')
-  }
+  if (event) {
+    ctx.session.event_url = event.url;
 
-  if (event == 2) {
-    ctx.session.event_url = 'https://github.com/DeveloperParana/certificados/blob/master/2017/conectadas/';
-    return ctx.redirect('/authorize')
+    if (event.type == 'email') {
+      return ctx.render('./email.hbs');
+    }
+
+    if (event.type == 'meetup') {
+      return ctx.redirect('/authorize');
+    }
   }
 
   return ctx.redirect('/error')
@@ -72,6 +89,7 @@ router.get('/event/:id', async ctx => {
 router.post('/event/access', async ctx => {
   let md5 = crypto.createHash('md5').update(ctx.request.body.email).digest('hex');
   const url = ctx.session.event_url + md5 + '.pdf';
+
   return ctx.redirect(url)
 })
 
