@@ -1,5 +1,4 @@
-const admin = require('firebase-admin');
-const axios = require('axios');
+const firebase = require('firebase-admin');
 const bodyParser = require('koa-bodyparser');
 const Koa = require('koa');
 const Router = require('koa-router');
@@ -34,8 +33,8 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 }))
 
 //Inicializando firebase
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
   databaseURL: env.FIREBASE_DATABASE_URL
 });
 
@@ -44,7 +43,7 @@ router.get('/', ctx => {
 
   return new Promise((resolve, reject) => {
     eventService
-        .getAll(admin)
+        .getAll(firebase)
         .then(result => {
             let data = result.val();
             ctx.session.events = data;
