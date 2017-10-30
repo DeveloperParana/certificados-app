@@ -1,0 +1,25 @@
+{
+  "name": "certificate-app",
+  "version": "0.0.1",
+  "description": "Certificate list app",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/developerparana/certificate-app.git"
+  },
+  "author": "Fernando Fabricio dos Santos <ferfabricio@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/developerparana/certificate-app/issues"
+  },
+  "homepage": "https://github.com/developerparana/certificate-app#readme",
+  "dependencies": {
+    "koa": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.6.1"
+  }
+}
