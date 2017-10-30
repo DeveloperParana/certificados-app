@@ -8,38 +8,22 @@ const session = require('koa-session');
 const views = require('koa-views');
 const yenv = require('yenv');
 
+const config = require('./src/infrastructure/config');
+const helperList = require('./src/helpers/view-list');
+
 const app = new Koa();
 const router = new Router();
 const env = yenv();
 
-const CONFIG = {
-  key: 'koa:sess',
-  maxAge: 3600,
-  overwrite: true,
-  httpOnly: true,
-  signed: true,
-  rolling: false
-};
-const MEETUP_OAUTH_URL = 'https://secure.meetup.com/oauth2/';
-const MEETUP_API_URL = 'https://api.meetup.com/';
-
 app.keys = [env.APP_KEY];
-app.use(session(CONFIG, app));
+app.use(session(config.SESSION, app));
 app.use(bodyParser());
 
-app.use(views(__dirname + '/views/', {
+app.use(views(__dirname + config.DIR_VIEWS, {
   map: { hbs: 'handlebars' },
   options: {
     helpers: {
-      list: (items, options) => {
-        var out = "<ul>";
-
-        for(var i=0, l=items.length; i<l; i++) {
-          out = out + "<li>" + options.fn(items[i]) + "</li>";
-        }
-
-        return out + "</ul>";
-      }
+      list: helperList.list
     }
   }
 }))
