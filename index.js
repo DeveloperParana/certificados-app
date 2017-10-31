@@ -149,4 +149,4 @@ router.get('/error', async ctx => {
 app.use(router.routes())
 
 console.log('APLICAÇÃO AGUARDANDO REQUISIÇÕES NA PORTA 3000');
-app.listen(3000)
+app.listen(process.env.PORT || 3000)
