@@ -16,6 +16,7 @@ const router = new Router();
 const env = yenv();
 
 //Adicionando suporte a sessão
+console.log('INICIALIZANDO SESSION');
 app.keys = [env.APP_KEY];
 app.use(session(config.SESSION, app));
 
@@ -23,6 +24,7 @@ app.use(session(config.SESSION, app));
 app.use(bodyParser());
 
 //Adicionando suporte a views com o handlebars
+console.log('INICIALIZANDO SUPORTE A VIEWS');
 app.use(views(__dirname + config.DIR_VIEWS, {
   map: { hbs: 'handlebars' },
   options: {
@@ -33,6 +35,7 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 }))
 
 //Inicializando firebase
+console.log('INICIALIZANDO CONEXÃO COM FIREBASE');
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
   databaseURL: env.FIREBASE_DATABASE_URL
@@ -141,4 +144,5 @@ router.get('/error', async ctx => {
 
 app.use(router.routes())
 
+console.log('APLICAÇÃO AGUARDANDO REQUISIÇÕES NA PORTA 3000');
 app.listen(3000)
