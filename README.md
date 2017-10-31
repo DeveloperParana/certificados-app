@@ -16,11 +16,11 @@ Para acessar o firebase você vai precisar de um json de configuração das cred
 O recurso utilizado do meetup.com é o OAuth Consumers, e o consumidor deve ser configurado em: [https://secure.meetup.com/meetup_api/oauth_consumers/?_locale=pt-BR](https://secure.meetup.com/meetup_api/oauth_consumers/?_locale=pt-BR).
 
 
-### Arquivo env.yaml
+### Arquivo .env
 
 Esse arquivo possui algumas configurações importantes para o sistema as quais devem ser configuradas de acordo com as url's utilizadas no OAuth Consumer.
 
-Um exemplo deste arquivo é encontrado no diretório como env.yaml.example.
+Um exemplo deste arquivo é encontrado no diretório como .env.example
 
 *Não versione esse arquivo!*
 
