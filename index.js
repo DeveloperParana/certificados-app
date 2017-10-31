@@ -4,7 +4,6 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const session = require('koa-session');
 const views = require('koa-views');
-const yenv = require('yenv');
 
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
@@ -13,11 +12,14 @@ const serviceAccount = require('./credential.json');
 
 const app = new Koa();
 const router = new Router();
-const env = yenv();
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+}
 
 //Adicionando suporte a sessão
 console.log('INICIALIZANDO SESSION');
-app.keys = [env.APP_KEY];
+app.keys = [process.env.APP_KEY];
 app.use(session(config.SESSION, app));
 
 //Adicionando suporte ao body-parser
@@ -38,7 +40,7 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 console.log('INICIALIZANDO CONEXÃO COM FIREBASE');
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
-  databaseURL: env.FIREBASE_DATABASE_URL
+  databaseURL: process.env.FIREBASE_DATABASE_URL
 });
 
 router.get('/', ctx => {
@@ -55,7 +57,7 @@ router.get('/', ctx => {
                 events: data.map(e => {
                   return {
                     name: e.name,
-                    url: env.BASE_URL + 'event/' + e.id.toString()
+                    url: process.env.BASE_URL + 'event/' + e.id.toString()
                   }
                 })
             };
@@ -99,8 +101,8 @@ router.get('/authorize', async ctx => {
   return ctx.redirect(
     meetupService.getRedirectURL(
       config.MEETUP_OAUTH_URL,
-      env.MEETUP_KEY,
-      env.AUTH_REDIRECT_URI
+      process.env.MEETUP_KEY,
+      process.env.AUTH_REDIRECT_URI
     )
   );
 })
@@ -110,9 +112,9 @@ router.get('/process', async ctx => {
     const meetupService = require('./src/services/meetup');
 
     const accessToken = await meetupService.getAccessToken(
-      env.MEETUP_KEY,
-      env.MEETUP_SECRET,
-      env.AUTH_REDIRECT_URI,
+      process.env.MEETUP_KEY,
+      process.env.MEETUP_SECRET,
+      process.env.AUTH_REDIRECT_URI,
       ctx.query.code,
       config.MEETUP_OAUTH_URL
     );

@@ -2,6 +2,9 @@
   "name": "certificate-app",
   "version": "0.0.1",
   "description": "Certificate list app",
+  "engines": {
+    "node": "8.x"
+  },
   "main": "index.js",
   "scripts": {
     "test": "jest"
@@ -18,14 +21,14 @@
   "homepage": "https://github.com/developerparana/certificate-app#readme",
   "dependencies": {
     "axios": "^0.17.0",
+    "dotenv": "^4.0.0",
     "firebase-admin": "^5.4.3",
     "handlebars": "^4.0.11",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-router": "^7.2.1",
     "koa-session": "^5.5.0",
-    "koa-views": "^6.1.1",
-    "yenv": "^1.0.6"
+    "koa-views": "^6.1.1"
   },
   "devDependencies": {
     "babel-preset-env": "^1.6.1"
