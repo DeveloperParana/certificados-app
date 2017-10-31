@@ -8,7 +8,6 @@ const views = require('koa-views');
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
 const md5 = require('./src/helpers/md5');
-const serviceAccount = require('./credential.json');
 
 const app = new Koa();
 const router = new Router();
@@ -39,7 +38,10 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 //Inicializando firebase
 console.log('INICIALIZANDO CONEXÃO COM FIREBASE');
 firebase.initializeApp({
-  credential: firebase.credential.cert(serviceAccount),
+  credential: firebase.credential.cert({
+    "private_key": process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    "client_email": process.env.FIREBASE_CLIENT_EMAIL
+  }),
   databaseURL: process.env.FIREBASE_DATABASE_URL
 });
 
