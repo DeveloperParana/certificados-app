@@ -76,24 +76,26 @@ router.get('/', ctx => {
 router.get('/event/:id', async ctx => {
   try {
     const eventService = require('./src/services/event');
-    const event = await eventService.getOne(firebase, parseInt(ctx.params.id));
+    const event = (await eventService.getOne(firebase, parseInt(ctx.params.id))).val();
 
-    winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event.val()});
+    winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event});
 
-    if (event) {
-      ctx.session.event_url = event.val().url;
+    if (!event) {
+      throw Exception('Event not found');
+    }
 
-      if (event.type == 'email') {
-        ctx.state = {
-          eventId: ctx.params.id
-        };
+    ctx.session.event_url = event.url;
 
-        return ctx.render('./email.hbs');
-      }
+    if (event.type == 'email') {
+      ctx.state = {
+        eventId: ctx.params.id
+      };
 
-      if (event.type == 'meetup') {
-        return ctx.redirect('/authorize');
-      }
+      return ctx.render('./email.hbs');
+    }
+
+    if (event.type == 'meetup') {
+      return ctx.redirect('/authorize');
     }
   } catch (e) {
     winston.log('error', 'Erro ao acessar evento', { key: 'event_selected', error: e })
