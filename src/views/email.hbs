@@ -8,6 +8,7 @@
 <body>
   <h1>Digite seu email para acessar o certificado</h1>
   <form action="/event/access" method="POST" accept-charset="utf-8">
+    <input name="event" type="hidden" value="{{ eventId }}" />
     <input name="email" type="email" placeholder="Digite seu email" />
     <input type="submit" value="Enviar">
   </form>

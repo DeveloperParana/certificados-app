@@ -74,31 +74,48 @@ router.get('/', ctx => {
 })
 
 router.get('/event/:id', async ctx => {
-  const filterEvents = require('./src/helpers/load-events');
-  const event = filterEvents.load(ctx.session.events, ctx.params.id);
+  try {
+    const eventService = require('./src/services/event');
+    const event = await eventService.getOne(firebase, parseInt(ctx.request.body.event));
 
-  winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event});
+    console.log(event.val())
+    return ctx.body = 'Teste';
 
-  if (event) {
-    ctx.session.event_url = event.url;
+    winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event.val()});
 
-    if (event.type == 'email') {
-      return ctx.render('./email.hbs');
+    if (event) {
+      ctx.session.event_url = event.val().url;
+
+      if (event.type == 'email') {
+        ctx.state = {
+          eventId: ctx.params.id
+        };
+
+        return ctx.render('./email.hbs');
+      }
+
+      if (event.type == 'meetup') {
+        return ctx.redirect('/authorize');
+      }
     }
-
-    if (event.type == 'meetup') {
-      return ctx.redirect('/authorize');
-    }
+  } catch (e) {
+    winston.log('error', 'Erro ao acessar evento', { key: 'event_selected', error: e })
+    return ctx.redirect('/error')
   }
-
-  return ctx.redirect('/error')
 })
 
 router.post('/event/access', async ctx => {
-  const url = ctx.session.event_url + md5(ctx.request.body.email) + '.pdf';
-  winston.log('info', 'Event access', { key: 'event_access', url: url, event_url: ctx.session.event_url });
+  try {
+    const eventService = require('./src/services/event');
+    const event = await eventService.getOne(firebase, parseInt(ctx.request.body.event));
+    const url = event.val().url + md5(ctx.request.body.email) + '.pdf';
+    winston.log('info', 'Event access', { key: 'event_access', url: url, event_url: ctx.session.event_url });
 
-  return ctx.redirect(url)
+    return ctx.redirect(url)
+  } catch (e) {
+    winston.log('error', 'Erro ao acessar evento', { key: 'event_selected', error: e })
+    return ctx.redirect('/error')
+  }
 })
 
 router.get('/authorize', async ctx => {
