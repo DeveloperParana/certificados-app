@@ -77,6 +77,8 @@ router.get('/event/:id', async ctx => {
   const filterEvents = require('./src/helpers/load-events');
   const event = filterEvents.load(ctx.session.events, ctx.params.id);
 
+  winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event});
+
   if (event) {
     ctx.session.event_url = event.url;
 
@@ -94,6 +96,7 @@ router.get('/event/:id', async ctx => {
 
 router.post('/event/access', async ctx => {
   const url = ctx.session.event_url + md5(ctx.request.body.email) + '.pdf';
+  winston.log('info', 'Event access', { key: 'event_access', url: url, event_url: ctx.session.event_url });
 
   return ctx.redirect(url)
 })
