@@ -73,35 +73,34 @@ router.get('/', ctx => {
   });
 })
 
-router.get('/event/:id', async ctx => {
-  try {
+router.get('/event/:id', ctx => {
+  return new Promise((resolve, reject) => {
     const eventService = require('./src/services/event');
-    const event = (await eventService.getOne(firebase, parseInt(ctx.params.id))).val();
+    eventService.getOne(firebase, parseInt(ctx.params.id)).then(event => {
+      let eventVal = event.val();
+      winston.log('info', 'Evento selecionado', { key: 'event_selected', event: eventVal});
 
-    winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event});
+      if (eventVal.type == 'email') {
+        ctx.state = {
+          eventId: ctx.params.id
+        };
 
-    if (!event) {
-      throw Exception('Event not found');
-    }
+        return resolve(ctx.render('./email.hbs'));
+      }
 
-    ctx.session.event_url = event.url;
+      if (eventVal.type == 'meetup') {
+        return resolve(ctx.redirect('/authorize'));
+      }
 
-    if (event.type == 'email') {
-      ctx.state = {
-        eventId: ctx.params.id
-      };
+      winston.log('error', 'Nenhuma ação para o evento', { key: 'event_selected', event: eventVal });
 
-      return ctx.render('./email.hbs');
-    }
-
-    if (event.type == 'meetup') {
-      return ctx.redirect('/authorize');
-    }
-  } catch (e) {
-    winston.log('error', 'Erro ao acessar evento', { key: 'event_selected', error: e })
-    return ctx.redirect('/error')
-  }
-})
+      return reject(ctx.redirect('/error'));
+    }).catch(error => {
+      winston.log('error', 'Erro ao acessar evento', { key: 'event_selected', id: ctx.params.id, error: error });
+      return reject(ctx.redirect('/error'));
+    });
+  });
+});
 
 router.post('/event/access', async ctx => {
   try {
