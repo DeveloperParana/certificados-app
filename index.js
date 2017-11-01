@@ -4,6 +4,7 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const session = require('koa-session');
 const views = require('koa-views');
+const winston = require('winston');
 
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
@@ -17,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 //Adicionando suporte a sessão
-console.log('INICIALIZANDO SESSION');
+winston.log('info', 'INICIALIZANDO SESSION', { key: 'initilize'});
 app.keys = [process.env.APP_KEY];
 app.use(session(config.SESSION, app));
 
@@ -25,7 +26,7 @@ app.use(session(config.SESSION, app));
 app.use(bodyParser());
 
 //Adicionando suporte a views com o handlebars
-console.log('INICIALIZANDO SUPORTE A VIEWS');
+winston.log('info', 'INICIALIZANDO SUPORTE A VIEWS', { key: 'initilize'});
 app.use(views(__dirname + config.DIR_VIEWS, {
   map: { hbs: 'handlebars' },
   options: {
@@ -36,7 +37,7 @@ app.use(views(__dirname + config.DIR_VIEWS, {
 }))
 
 //Inicializando firebase
-console.log('INICIALIZANDO CONEXÃO COM FIREBASE');
+winston.log('info', 'INICIALIZANDO CONEXÃO COM FIREBASE', { key: 'initilize'});
 firebase.initializeApp({
   credential: firebase.credential.cert({
     "private_key": process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
@@ -147,6 +148,5 @@ router.get('/error', async ctx => {
 })
 
 app.use(router.routes())
-
-console.log('APLICAÇÃO AGUARDANDO REQUISIÇÕES NA PORTA 3000');
+winston.log('info', 'APLICAÇÃO AGUARDANDO REQUISIÇÕES', { key: 'initilize'});
 app.listen(process.env.PORT || 3000)
