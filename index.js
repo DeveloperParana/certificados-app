@@ -76,10 +76,7 @@ router.get('/', ctx => {
 router.get('/event/:id', async ctx => {
   try {
     const eventService = require('./src/services/event');
-    const event = await eventService.getOne(firebase, parseInt(ctx.request.body.event));
-
-    console.log(event.val())
-    return ctx.body = 'Teste';
+    const event = await eventService.getOne(firebase, parseInt(ctx.params.id));
 
     winston.log('info', 'Evento selecionado', { key: 'event_selected', event: event.val()});
 
