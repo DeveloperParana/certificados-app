@@ -77,7 +77,7 @@ router.get('/event/:id', ctx => {
   return new Promise((resolve, reject) => {
     const eventService = require('./src/services/event');
     eventService.getOne(firebase, parseInt(ctx.params.id)).then(event => {
-      let eventVal = event.val();
+      let eventVal = event.val()[0];
       winston.log('info', 'Evento selecionado', { key: 'event_selected', event: eventVal});
 
       if (eventVal.type == 'email') {
@@ -106,7 +106,7 @@ router.post('/event/access', async ctx => {
   try {
     const eventService = require('./src/services/event');
     const event = await eventService.getOne(firebase, parseInt(ctx.request.body.event));
-    const url = event.val().url + md5(ctx.request.body.email) + '.pdf';
+    const url = event.val()[0].url + md5(ctx.request.body.email) + '.pdf';
     winston.log('info', 'Event access', { key: 'event_access', url: url, event_url: ctx.session.event_url });
 
     return ctx.redirect(url)
