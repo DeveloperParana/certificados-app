@@ -119,6 +119,8 @@ router.post('/event/access', async ctx => {
 router.get('/authorize', async ctx => {
   const meetupService = require('./src/services/meetup');
 
+  winston.log('info', 'Redirect realizado', { key: 'event_authorize', event_url: ctx.session.event_url });
+
   return ctx.redirect(
     meetupService.getRedirectURL(
       config.MEETUP_OAUTH_URL,
@@ -131,6 +133,8 @@ router.get('/authorize', async ctx => {
 router.get('/process', async ctx => {
   try {
     const meetupService = require('./src/services/meetup');
+
+    winston.log('info', 'Requisição de dados para o Meetup', { key: 'event_process', code: ctx.query.code });
 
     const accessToken = await meetupService.getAccessToken(
       process.env.MEETUP_KEY,
@@ -146,23 +150,25 @@ router.get('/process', async ctx => {
     );
 
     const eventUrl = ctx.session.event_url + md5(member.data.id.toString()) + '.pdf';
+    winston.log('info', 'URL de certificado criada', {
+      key: 'event_process',
+      urlCertificado: eventUrl,
+      memberId: member.data.id.toString()
+    });
 
-    ctx.state = {
-      name: member.data.name,
-      id: member.data.id,
-      url: eventUrl
-    };
-
-    return ctx.render('./temp.hbs')
+    return ctx.redirect(eventUrl);
   } catch (e) {
-    console.log(e)
+    winston.log('error', 'Erro ao processar acesso', {
+      key: 'event_process',
+      error: e
+    });
     return ctx.redirect('/error')
   }
 })
 
 router.get('/error', async ctx => {
   ctx.body = "Some error happen"
-  ctx.status = 404;
+  ctx.status = 500;
 })
 
 app.use(router.routes())
