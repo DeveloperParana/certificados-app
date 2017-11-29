@@ -86,7 +86,7 @@ router.get('/event/:id', ctx => {
           }));
         }
 
-        if (eventVal.type === 'meetup') {
+        if (event.type === 'meetup') {
           return resolve(ctx.redirect('/authorize'));
         }
       })
