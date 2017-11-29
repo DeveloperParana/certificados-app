@@ -1,12 +1,28 @@
 module.exports = {
-  getAll: firebase => {
-    const events = firebase.database().ref('/events');
-
-    return events.once('value');
+  getAll: axios => {
+    return new Promise((resolve, reject) => {
+      axios
+        .get('https://devparana-certificates.firebaseio.com/events.json')
+        .then(response => {
+          resolve(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+          reject();
+        })
+    });
   },
-  getOne: async (firebase, id) => {
-    const event = firebase.database().ref('/events').orderByChild("id").equalTo(id)
-
-    return event.once('value');
+  getOne: async (axios, id) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .get('https://devparana-certificates.firebaseio.com/events.json')
+        .then(result => {
+          resolve(result.data.filter(e => { return e.id === id })[0])
+        })
+        .catch(error => {
+          console.log(error);
+          reject();
+        })
+    });
   }
 }

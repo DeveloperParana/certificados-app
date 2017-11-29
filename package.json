@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com/developerparana/certificate-app#readme",
   "dependencies": {
-    "axios": "^0.17.0",
+    "axios": "^0.17.1",
     "dotenv": "^4.0.0",
-    "firebase-admin": "^5.4.3",
     "handlebars": "^4.0.11",
+    "keygrip": "^1.0.2",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-router": "^7.2.1",
