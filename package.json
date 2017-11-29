@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/developerparana/certificate-app#readme",
   "dependencies": {
+    "axios": "^0.17.1",
     "dotenv": "^4.0.0",
     "handlebars": "^4.0.11",
     "keygrip": "^1.0.2",

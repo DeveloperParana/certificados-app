@@ -13,10 +13,10 @@ module.exports = {
   getOne: async (id) => {
     return new Promise((resolve, reject) => {
       if (events.length > 0) {
-        return resolve(events.data.filter(e => { return e.id === id })[0])
+        return resolve(events.filter(e => { return e.id === id })[0])
       }
       
-      reject();
+      reject('erro ao carregar');
     });
   }
 }
