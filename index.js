@@ -1,4 +1,3 @@
-const axios = require('axios');
 const bodyParser = require('koa-bodyparser');
 const KeyGrip = require('keygrip');
 const Koa = require('koa');
@@ -48,7 +47,7 @@ router.get('/', ctx => {
 
   return new Promise((resolve, reject) => {
     eventService
-      .getAll(axios)
+      .getAll()
       .then(result => {
         ctx.state = {
           events: result.map(e => {
@@ -71,7 +70,7 @@ router.get('/event/:id', ctx => {
   return new Promise((resolve, reject) => {
     const eventService = require('./src/services/event');
     eventService
-      .getOne(axios, parseInt(ctx.params.id))
+      .getOne(parseInt(ctx.params.id))
       .then(event => {
         winston.log('info', 'Evento selecionado', {
           key: 'event_selected',

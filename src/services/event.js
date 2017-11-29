@@ -1,28 +1,22 @@
+const events = require('../../events.json');
+
 module.exports = {
-  getAll: axios => {
+  getAll: () => {
     return new Promise((resolve, reject) => {
-      axios
-        .get('https://devparana-certificates.firebaseio.com/events.json')
-        .then(response => {
-          resolve(response.data);
-        })
-        .catch(error => {
-          console.log(error);
-          reject();
-        })
+      if (events.length > 0) {
+        return resolve(events);
+      }
+
+      reject('erro ao carregar');
     });
   },
-  getOne: async (axios, id) => {
+  getOne: async (id) => {
     return new Promise((resolve, reject) => {
-      axios
-        .get('https://devparana-certificates.firebaseio.com/events.json')
-        .then(result => {
-          resolve(result.data.filter(e => { return e.id === id })[0])
-        })
-        .catch(error => {
-          console.log(error);
-          reject();
-        })
+      if (events.length > 0) {
+        return resolve(events.data.filter(e => { return e.id === id })[0])
+      }
+      
+      reject();
     });
   }
 }
