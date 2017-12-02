@@ -1,10 +1,12 @@
 const bodyParser = require('koa-bodyparser');
+const enforceHttps = require('koa-sslify');
 const KeyGrip = require('keygrip');
 const Koa = require('koa');
 const Router = require('koa-router');
 const session = require('koa-session');
 const views = require('koa-views');
 const winston = require('winston');
+
 
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
@@ -23,6 +25,12 @@ winston.log('info', 'INICIALIZANDO SESSION', {
 });
 app.keys = new KeyGrip([process.env.APP_KEY1, process.env.APP_KEY2], 'sha256');
 app.use(session(config.SESSION, app));
+
+if (process.env.SSL_ONLY === '1') {
+  app.use(enforceHttps({
+    trustProtoHeader: true
+  }))
+}
 
 //Adicionando suporte ao body-parser
 app.use(bodyParser());
