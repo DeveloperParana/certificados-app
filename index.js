@@ -10,6 +10,7 @@ const winston = require('winston');
 
 const config = require('./src/infrastructure/config');
 const helperList = require('./src/helpers/view-list');
+const redirectHelper = require('./src/helpers/redirect');
 const md5 = require('./src/helpers/md5');
 
 const app = new Koa();
@@ -120,7 +121,7 @@ router.post('/event/access', async ctx => {
       event_url: ctx.session.event_url
     });
 
-    return ctx.redirect(url)
+    return redirectHelper.redirect(ctx, url);
   } catch (e) {
     winston.log('error', 'Erro ao acessar evento', {
       key: 'event_selected',
@@ -178,7 +179,7 @@ router.get('/process', async ctx => {
       memberId: member.data.id.toString()
     });
 
-    return ctx.redirect(eventUrl);
+    return redirectHelper.redirect(ctx, eventUrl);
   } catch (e) {
     winston.log('error', 'Erro ao processar acesso', {
       key: 'event_process',
@@ -191,6 +192,10 @@ router.get('/process', async ctx => {
 router.get('/error', async ctx => {
   ctx.body = "Some error happen"
   ctx.status = 500;
+})
+
+router.get('/certificate-not-found', async ctx => {
+  return ctx.render('./certificate-not-found.hbs')
 })
 
 app.use(router.routes())
