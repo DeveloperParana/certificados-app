@@ -17,5 +17,12 @@
     "name": "Xamarin Dev Days",
     "type": "email",
     "url": "https://github.com/DeveloperParana/certificados/blob/master/2017/xamarin/"
+},
+{
+    "date": "2016-03-19",
+    "id": 4,
+    "name": "2º Meetup DevParaná",
+    "type": "meetup",
+    "url": "https://github.com/DeveloperParana/certificados/blob/master/2016/2meetup/"
 }
 ]
